@@ -1,0 +1,125 @@
+﻿@model IEnumerable<WebApplication1.Controllers.Model>
+
+@{
+    ViewBag.Title = "WebGrid";
+    if (ViewBag.sortCol == "CompanyName" | ViewBag.sortCol == "ContactName")
+    { ViewBag.sortCol = "Customers." + ViewBag.sortCol; }
+    var grid = new WebGrid(null,
+        defaultSort: ViewBag.sortCol,
+        sortFieldName: "sortCol",
+        sortDirectionFieldName: "sortDir",
+        rowsPerPage: ViewBag.rowsPerPage);
+    grid.Bind(Model, rowCount: ViewBag.count, autoSortAndPage: false);
+    grid.Pager(WebGridPagerModes.All);
+}
+
+<STYLE type="text/css">
+    .webgrid-table, tr, td, th{
+        border: 1px solid #dddddd;
+    }
+
+    .Freight{
+        text-align: right;
+    }
+
+    .OrderDate{
+        text-align: right;
+    }
+
+    .OrderID {
+        text-align: right;
+    }
+</STYLE>
+
+<h2>WebGrid View</h2>
+
+<h3>Implemented</h3>
+<ul>
+    <li>table borders ✓</li>
+    <li>header up/down arrows ✓</li>
+    <li>secondary sorting on orderid ✓</li>
+    <li>sorting on name and age ✓</li>
+    <li>price currency formating ✓</li>
+    <li>numbers right alignment✓</li>
+    <li>pager complete ✓</li>
+    <li>ordering by: ??? ??? ✓</li>
+    <li>generated request sql: ??? ✓</li>
+</ul>
+
+@{ 
+    string thisSort = "";
+    string thisDir = "";
+    List<string> dblist = new List<string>();
+    dblist.Add("OrderID");
+    dblist.Add("OrderDate");
+    dblist.Add("Freight");
+    dblist.Add("ShipCity");
+    dblist.Add("ShipCountry");
+    dblist.Add("Customer.CompanyName");
+    dblist.Add("Customer.ContactName");
+    dblist.Add("Employee.FirstName");
+    dblist.Add("Employee.LastName");
+    dblist.Add("CompanyName");
+    dblist.Add("ContactName");
+    dblist.Add("EmpFirstName");
+    dblist.Add("EmpLastName");
+    List<string> list = new List<string>();
+    list.Add("Order ID");
+    list.Add("Order Date");
+    list.Add("Freight");
+    list.Add("Ship City");
+    list.Add("Ship Country");
+    list.Add("Company Name");
+    list.Add("Contact Name");
+    list.Add("Emp First Name");
+    list.Add("Emp Last Name");
+    for (int i = 0; i < 9; i++)
+    {
+        if (ViewBag.sortCol == dblist[i] && ViewBag.sortDir == "ASC")
+        {
+            if (i > 4) { thisSort = dblist[i + 4]; }
+            else { thisSort = dblist[i]; }
+            thisDir = "Ascending";
+            list[i] = list[i] + "▲";
+        }
+        else if (ViewBag.sortCol == dblist[i] && ViewBag.sortDir == "DESC")
+        {
+            if (i > 4) { thisSort = dblist[i + 4]; }
+            else { thisSort = dblist[i]; }
+            thisDir = "Descending";
+            list[i] = list[i] + "▼";
+        }
+    }
+}
+
+<div>
+    @grid.GetHtml(
+    tableStyle: "table",
+        columns: grid.Columns(
+            grid.Column(header: list[0], columnName: "OrderID", style: "OrderID"),
+            grid.Column(header: list[1], columnName: "OrderDate", style: "OrderDate"),
+            grid.Column(header: list[2], columnName: "Freight", style: "Freight"),
+            grid.Column(header: list[3], columnName: "ShipCity", style: "ShipCity"),
+            grid.Column(header: list[4], columnName: "ShipCountry", style: "ShipCountry"),
+            grid.Column(header: list[5], columnName: "CompanyName", style: "CompanyName"),
+            grid.Column(header: list[6], columnName: "ContactName", style: "ContactName"),
+            grid.Column(header: list[7], columnName: "EmpFirstName", style: "EmpFirstName"),
+            grid.Column(header: list[8], columnName: "EmpLastName", style: "EmpLastName")
+        ),
+        mode: WebGridPagerModes.All
+    )
+    
+    <div>
+        <h3>Ordering by:</h3>
+        <b>@(thisSort)</b> @(thisDir)
+    </div>
+</div>
+
+<hr />
+
+<div style="max-width: 100%;">
+    <h4>Request SQL:</h4>
+    <textarea id="styled" rows="16" cols="100" style="max-width: 100%;">
+        @(ViewBag.sql)
+    </textarea>
+</div>
